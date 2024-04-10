@@ -1,0 +1,47 @@
+- name: Instalar dependencias de Docker
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+    update_cache: yes
+
+- name: Agregar la clave GPG oficial de Docker
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Agregar el repositorio de Docker
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+- name: Instalar Docker CE
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+
+- name: Añadir usuario al grupo Docker
+  ansible.builtin.user:
+    name: "{{ ansible_env.SUDO_USER | default(ansible_env.USER) }}"
+    groups: docker
+    append: yes
+
+- name: Asegurar que Python3 esté instalado
+  apt:
+    name: python3
+    state: present
+
+- name: Instalar pip para Python3
+  apt:
+    name: python3-pip
+    state: present
+    update_cache: yes
+
+- name: Instalar Docker SDK para Python
+  ansible.builtin.pip:
+    name: docker
+    state: present
